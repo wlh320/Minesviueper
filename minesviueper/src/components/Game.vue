@@ -1,24 +1,34 @@
 <template>
   <div class="game">
     <start-page v-if="!start"></start-page>
-    <div class="columns">
-      <div class="column"></div>
-      <div class="gameboard" v-if="start">
-        <section class="section">
-          <div class="leftCnt content has-text-centered is-medium">
-          left mines:{{leftMines}}
+    <div class="gameboard" v-if="start">
+      <section class="hero is-small is-bold is-dark"
+        :class="{'is-success':win, 'is-warning':lose}">
+        <div class="hero-body">
+          <div class="container">
+            <h1 class="title has-text-centered">
+              {{info}}
+            </h1>
           </div>
-        </section>
-        <table>
-          <tr v-for="(row, i) in board" :key="i">
-            <td v-for="(c, j) in row" :key="j" >
-              <cell :data="c" :curr="setCurr(i, j)">
-              </cell>
-            </td>
-          </tr>
-        </table>
+        </div>
+      </section>
+      <div class="columns">
+        <div class="column">
+          <div class="left-cnt content has-text-centered is-medium">
+          mines left: {{leftMines}}
+          </div>
+          <div align="center">
+            <table>
+              <tr v-for="(row, i) in board" :key="i">
+                <td v-for="(c, j) in row" :key="j" >
+                  <cell :data="c" :curr="setCurr(i, j)">
+                  </cell>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
       </div>
-      <div class="column"></div>
     </div>
   </div>
 </template>
@@ -74,7 +84,12 @@ export default {
     },
     gameOver: function () {
       this.lose = true
-      alert('Gamer Over')
+      for (let i = 1; i <= this.rows; i++) { // open all cells
+        for (let j = 1; j <= this.cols; j++) {
+          this.board[i][j].opened = true
+        }
+      }
+      // alert('Gamer Over')
     },
     gameWin: function () {
       this.win = true
@@ -83,7 +98,7 @@ export default {
           this.board[i][j].opened = true
         }
       }
-      alert('You Win')
+      // alert('You Win')
     },
     overBoarder (cr, cc) {
       return cr < 1 || cr > this.rows || cc < 1 || cc > this.cols
@@ -167,21 +182,23 @@ export default {
       this.generateMines()
     },
     execute: function (cmd) {
-      console.log(cmd)
-      if (this.lose && cmd !== ':r') {
+      if (this.lose && cmd !== ':r' && cmd !== ':q') {
         return
       }
       switch (cmd) {
         case ':s':
+        case ':start':
           this.start = true
           this.startGame()
           break
         case ':r':
+        case ':restart':
           if (this.start) {
             this.startGame()
           }
           break
         case ':q':
+        case ':quit':
           this.start = false
           break
         case 'h':
@@ -253,6 +270,22 @@ export default {
         this.gameWin()
       }
     }
+  },
+  computed: {
+    info: function () {
+      if (this.lose) {
+        return 'You Lose!'
+      } else if (this.win) {
+        return 'You Win!'
+      } else {
+        return 'Minesviueper'
+      }
+    }
   }
 }
 </script>
+<style scoped>
+.left-cnt {
+  margin-top: 1.5rem;
+}
+</style>

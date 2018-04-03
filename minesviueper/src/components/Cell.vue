@@ -35,7 +35,8 @@ export default {
   background-color:hsl(171, 100%, 41%);
 }
 .cell {
-  height: 30px;
-  width: 30px;
+  height: 2.5rem;
+  width: 2.5rem;
+  font-size: 1rem;
 }
 </style>

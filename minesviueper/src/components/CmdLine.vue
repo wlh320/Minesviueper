@@ -75,7 +75,6 @@ export default {
   mounted () {
     this.bodyListener = (e) => {
       this.handleKey(e)
-      console.log(e)
     }
     document.body.addEventListener('keydown', this.bodyListener, false)
   },
@@ -86,15 +85,15 @@ export default {
 </script>
 <style>
 .cmd{
-    width:100%;
-    position:absolute;
-    bottom:0;
-    left:0;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
     /* font-size: 1.5rem; */
     background-color: #EEFFBB;
 }
 .cmd a {
   color: black;
-  font-family: monospace;
+  font-family: 'Hack', 'Consolas', monospace;
 }
 </style>
