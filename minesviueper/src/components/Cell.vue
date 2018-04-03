@@ -1,0 +1,41 @@
+<template>
+  <button v-if="!isBorder"
+  :class="['cell', 'button', {'chosen':curr}]">
+    <div v-if="data.opened">
+      <div v-if="!isMine">{{data.n}}</div>
+      <div v-if="isMine">X</div>
+    </div>
+    <div v-if="data.flagged">
+      F
+    </div>
+  </button>
+</template>
+
+<script>
+export default {
+  props: ['data', 'curr'],
+  data: function () {
+    return {
+      'wtf': 'fuck'
+    }
+  },
+  computed: {
+    isMine: function () {
+      return this.data.n === 9
+    },
+    isBorder: function () {
+      return this.data.n === -1
+    }
+  }
+}
+</script>
+
+<style>
+.chosen {
+  background-color:hsl(171, 100%, 41%);
+}
+.cell {
+  height: 30px;
+  width: 30px;
+}
+</style>
