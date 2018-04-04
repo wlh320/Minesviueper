@@ -41,6 +41,6 @@ type `:r<Enter>` to restart game
 
 ## TODO
 
-- add a timer
-- add more css style
+- [x] add a timer
+- [ ] add more css style
 

@@ -2,12 +2,10 @@
   <button v-if="!isBorder"
   :class="['cell', 'button', {'chosen':curr}]">
     <div v-if="data.opened">
-      <div v-if="!isMine">{{data.n}}</div>
-      <div v-if="isMine">X</div>
+      <div v-if="!isMine" class="number-cell">{{data.n}}</div>
+      <div v-if="isMine" class="mine-cell">X</div>
     </div>
-    <div v-if="data.flagged">
-      F
-    </div>
+    <div v-if="data.flagged" class="flag-cell">F</div>
   </button>
 </template>
 
@@ -38,5 +36,14 @@ export default {
   height: 2.5rem;
   width: 2.5rem;
   font-size: 1rem;
+}
+.flag-cell {
+  color: red;
+}
+.mine-cell {
+  color: darkorange;
+}
+.number-cell {
+  color: black;
 }
 </style>

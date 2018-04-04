@@ -5,6 +5,7 @@
       <section class="hero is-small is-bold is-dark"
         :class="{'is-success':win, 'is-warning':lose}">
         <div class="hero-body">
+          <div class="cheat" :class="cheatInfo===1?'cheat-mine' : ''" v-if="cheat"></div>
           <div class="container">
             <h1 class="title has-text-centered">
               {{info}}
@@ -15,7 +16,8 @@
       <div class="columns">
         <div class="column">
           <div class="left-cnt content has-text-centered is-medium">
-          mines left: {{leftMines}}
+            mines {{leftMines}} &emsp;&emsp;&emsp;
+            time {{time}}
           </div>
           <div align="center">
             <table>
@@ -50,8 +52,10 @@ export default {
       cc: 1, // current col
       lose: false,
       win: false,
-      adj: [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
-
+      adj: [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]],
+      timer: null,
+      time: 0,
+      cheat: false
     }
   },
   methods: {
@@ -84,21 +88,21 @@ export default {
     },
     gameOver: function () {
       this.lose = true
+      window.clearInterval(this.timer)
       for (let i = 1; i <= this.rows; i++) { // open all cells
         for (let j = 1; j <= this.cols; j++) {
           this.board[i][j].opened = true
         }
       }
-      // alert('Gamer Over')
     },
     gameWin: function () {
       this.win = true
+      window.clearInterval(this.timer)
       for (let i = 1; i <= this.rows; i++) { // open all cells
         for (let j = 1; j <= this.cols; j++) {
           this.board[i][j].opened = true
         }
       }
-      // alert('You Win')
     },
     overBoarder (cr, cc) {
       return cr < 1 || cr > this.rows || cc < 1 || cc > this.cols
@@ -148,10 +152,9 @@ export default {
     },
     flagCell: function () {
       let curCell = this.board[this.cr][this.cc]
+      if (curCell.opened) return
       let old = curCell.flagged
-      if (!curCell.opened) {
-        curCell.flagged = !old
-      }
+      curCell.flagged = !old
       if (old === false) {
         this.leftMines--
       } else {
@@ -161,6 +164,7 @@ export default {
     startGame: function () {
       this.cr = 1
       this.cc = 1
+      this.time = 0
       this.openedCells = 0
       this.lose = false
       this.win = false
@@ -180,6 +184,9 @@ export default {
         this.board.push(row)
       }
       this.generateMines()
+      this.timer = setInterval(() => {
+        this.time += 1
+      }, 1000)
     },
     execute: function (cmd) {
       if (this.lose && cmd !== ':r' && cmd !== ':q') {
@@ -256,6 +263,9 @@ export default {
         case 'i':
           this.openNeighbour()
           break
+        case ':xyzzy':
+          this.cheat = !this.cheat
+          break
         default:
           break
       }
@@ -277,9 +287,14 @@ export default {
         return 'You Lose!'
       } else if (this.win) {
         return 'You Win!'
+      } else if (this.cheat) {
+        return 'Cheater!!!'
       } else {
         return 'Minesviueper'
       }
+    },
+    cheatInfo: function () {
+      return this.board[this.cr][this.cc].n === 9 ? 1 : 0
     }
   }
 }
@@ -287,5 +302,15 @@ export default {
 <style scoped>
 .left-cnt {
   margin-top: 1.5rem;
+}
+.cheat {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+}
+.cheat-mine {
+  background-color: white;
 }
 </style>
