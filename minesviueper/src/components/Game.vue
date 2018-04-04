@@ -86,30 +86,12 @@ export default {
         }
       }
     },
-    gameOver: function () {
-      this.lose = true
-      window.clearInterval(this.timer)
-      for (let i = 1; i <= this.rows; i++) { // open all cells
-        for (let j = 1; j <= this.cols; j++) {
-          this.board[i][j].opened = true
-        }
-      }
-    },
-    gameWin: function () {
-      this.win = true
-      window.clearInterval(this.timer)
-      for (let i = 1; i <= this.rows; i++) { // open all cells
-        for (let j = 1; j <= this.cols; j++) {
-          this.board[i][j].opened = true
-        }
-      }
-    },
-    overBoarder (cr, cc) {
+    overBorder (cr, cc) {
       return cr < 1 || cr > this.rows || cc < 1 || cc > this.cols
     },
     openCell: function (cr, cc) {
       let board = this.board
-      if (this.overBoarder(cr, cc)) {
+      if (this.overBorder(cr, cc)) {
         return
       }
       if (!board[cr][cc].flagged && !board[cr][cc].opened) {
@@ -117,10 +99,11 @@ export default {
         this.openedCells++
       }
       if (board[cr][cc].n === 9 && !board[cr][cc].flagged) { // BOMB!
-        this.gameOver()
+        this.lose = true
+        this.endGame()
         return
       }
-      // BFS open 8 neighbours
+      // BFS open 8 neighbours with n === 0
       let q = []
       q.push([cr, cc])
       while (q.length !== 0) {
@@ -130,7 +113,7 @@ export default {
         for (let k = 0; k < 8; k++) {
           let nx = x + this.adj[k][0]
           let ny = y + this.adj[k][1]
-          if (this.overBoarder(nx, ny)) {
+          if (this.overBorder(nx, ny)) {
             continue
           }
           let cur = board[nx][ny]
@@ -188,6 +171,14 @@ export default {
         this.time += 1
       }, 1000)
     },
+    endGame: function () {
+      window.clearInterval(this.timer)
+      for (let i = 1; i <= this.rows; i++) { // open all cells
+        for (let j = 1; j <= this.cols; j++) {
+          this.board[i][j].opened = true
+        }
+      }
+    },
     execute: function (cmd) {
       if (this.lose && cmd !== ':r' && cmd !== ':q') {
         return
@@ -201,6 +192,7 @@ export default {
         case ':r':
         case ':restart':
           if (this.start) {
+            this.endGame()
             this.startGame()
           }
           break
@@ -241,18 +233,24 @@ export default {
           this.cr = this.rows
           break
         case 'b': // jump to prev not opened cell
-          while ((this.board[this.cr][this.cc].opened ||
-                  this.board[this.cr][this.cc].flagged) &&
-                  this.cc > 1) {
-            this.cc--
+          if (this.overBorder(this.cr, this.cc - 1)) {
+            return
           }
+          do {
+            this.cc--
+          } while ((this.board[this.cr][this.cc].opened ||
+                  this.board[this.cr][this.cc].flagged) &&
+                  this.cc > 1)
           break
         case 'w': // jump to next not opened cell
-          while ((this.board[this.cr][this.cc].opened ||
-                  this.board[this.cr][this.cc].flagged) &&
-                  this.cc < this.cols) {
-            this.cc++
+          if (this.overBorder(this.cr, this.cc + 1)) {
+            return
           }
+          do {
+            this.cc++
+          } while ((this.board[this.cr][this.cc].opened ||
+                  this.board[this.cr][this.cc].flagged) &&
+                  this.cc < this.cols)
           break
         case 'a':
           this.openCell(this.cr, this.cc)
@@ -277,7 +275,8 @@ export default {
   watch: {
     openedCells: function (val) {
       if (val === (this.cols * this.rows - this.totalMines)) {
-        this.gameWin()
+        this.win = true
+        this.endGame()
       }
     }
   },
@@ -299,6 +298,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 .left-cnt {
   margin-top: 1.5rem;

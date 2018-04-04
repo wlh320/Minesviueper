@@ -42,5 +42,8 @@ type `:r<Enter>` to restart game
 ## TODO
 
 - [x] add a timer
-- [ ] add more css style
+
+- [ ] add more css style 太丑了, 真的不会弄, 等高人相助
+
+- [ ] customize difficulty(number of rows/cols/mines)
 
